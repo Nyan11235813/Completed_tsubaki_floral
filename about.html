@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - TSUBAKI FLORAL</title>
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="assets/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3" href="index.php">
+                <i class="bi bi-flower1 text-primary me-2"></i>
+                TSUBAKI FLORAL
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="index.php">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="shop.php">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="about.html">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#searchCollapse" aria-expanded="false" aria-controls="searchCollapse">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div> 
+                    
+                    <!-- Cart -->
+                    <button class="btn btn-outline-primary position-relative me-2" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+                        <i class="bi bi-bag"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">0</span>
+                    </button>
+                    
+                </div>
+            </div>
+        </div>
+        <!-- Search Collapse -->
+        <div class="collapse" id="searchCollapse">
+            <div class="container-fluid py-3 border-top">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+                        <form action="search.php" method="GET">
+                            <div class="input-group input-group-lg">
+                                <input type="text" class="form-control" name="q" placeholder="Search flowers, arrangements..." 
+                                       aria-label="Search" id="searchInput">
+                                <button class="btn btn-primary" type="submit" id="searchBtn">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+
+                            <div id="searchSuggestions" class="mt-2"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="py-5 bg-light">
+        <div class="container text-center">
+                <h1 class="display-4 fw-bold mb-3">About TSUBAKI FLORAL</h1>
+                <p class="lead text-muted">Crafting beautiful moments with nature's finest blooms since 2018</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-5 align-items-center">
+                <!-- Story Section -->
+                <div class="col-lg-6">
+                    <h2 class="fw-bold mb-4">Our Story</h2>
+                    <p class="mb-4">Founded with a passion for bringing nature's beauty into everyday life, TSUBAKI FLORAL has been creating stunning floral arrangements that celebrate life's precious moments. Our journey began with a simple belief: every flower tells a story, and every arrangement should capture the emotions of the moment.</p>
+                    <p class="mb-4">From intimate bouquets to grand wedding ceremonies, we pour our heart into every creation, ensuring that each arrangement reflects the unique beauty and sentiment of the occasion.</p>
+                </div>
+                <div class="col-lg-6">
+                    <img src="assets/images/img2.jpg" class="img-fluid rounded shadow" alt="Our floral studio">
+                </div>
+            </div>
+
+            <!-- Values Section -->
+            <div class="row g-4 mt-5">
+                <div class="col-md-4 text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-flower2 display-4 text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Artistry</h5>
+                    <p class="text-muted">Each arrangement is a unique work of art, carefully designed to capture natural beauty.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-gem display-4 text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Premium</h5>
+                    <p class="text-muted">We select only the finest flowers and materials to create exceptional arrangements.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-infinity display-4 text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Timeless</h5>
+                    <p class="text-muted">Our designs create lasting memories that bloom beyond the moment.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer (simplified) -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 TSUBAKI FLORAL. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript Placeholder -->
+    <script src="assets/script.js"></script>
+</body>
+</html>
