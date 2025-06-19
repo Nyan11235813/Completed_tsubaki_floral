@@ -49,10 +49,10 @@
                             <img src="<?php echo htmlspecialchars($row["image_url"]); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row["name"]); ?>">
                             <div class="product-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
                                 <div class="text-center">
-                                    <button class="btn btn-light btn-sm me-2" title="Quick View" data-quick-view="<?php echo htmlspecialchars($row_featured["id"]); ?>">
+                                    <button class="btn btn-light btn-sm me-2" title="Quick View" data-quick-view="<?php echo htmlspecialchars($row["id"]); ?>">
                                         <i class="bi bi-eye"></i>
                                     </button>
-                                    <button class="btn btn-primary btn-sm" title="Add to Cart" data-add-to-cart="<?php echo htmlspecialchars($row_featured["id"]); ?>">
+                                    <button class="btn btn-primary btn-sm" title="Add to Cart" data-add-to-cart="<?php echo htmlspecialchars($row["id"]); ?>">
                                         <i class="bi bi-bag-plus"></i>
                                     </button>
                                 </div>
@@ -65,7 +65,7 @@
                                 <span class="h5 mb-0 fw-bold text-primary">¥<?php echo number_format($row["price"], 0); ?></span>
                                 <div class="text-warning">
                                     <?php
-                                    $rating = round($row["rating"]);
+                                    $rating = isset($row["rating"]) ? round($row["rating"]) : 5;
                                     for ($i = 1; $i <= 5; $i++) {
                                         if ($i <= $rating) {
                                             echo '<i class="bi bi-star-fill"></i>';
@@ -74,7 +74,7 @@
                                         }
                                     }
                                     ?>
-                                    <span class="text-muted small ms-1">(<?php echo htmlspecialchars($row["reviews_count"]); ?>)</span>
+                                    <span class="text-muted small ms-1">(<?php echo isset($row["reviews_count"]) ? htmlspecialchars($row["reviews_count"]) : '0'; ?>)</span>
                                 </div>
                             </div>
                         </div>
@@ -141,7 +141,7 @@
                     <h5 class="fw-bold mb-3">
                         <i class="bi bi-flower1 me-2"></i>
                         TSUBAKI FLORAL
-                    </h5>
+                    </div>
                     <p class="mb-3">
                         Creating beautiful moments with elegant floral arrangements.
                         Premium flowers delivered fresh to your door.
@@ -171,7 +171,6 @@
     </button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-
     <script src="assets/script.js"></script>
 </body>
 </html>
