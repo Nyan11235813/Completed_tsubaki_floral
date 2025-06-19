@@ -1,8 +1,3 @@
-/**
- * TSUBAKI FLORAL - Fixed JavaScript
- * Clean, beginner-friendly flower shop website functionality
- */
-
 // =====================================================
 // MAIN APPLICATION STATE
 // =====================================================
@@ -14,69 +9,63 @@ const TsubakilFloral = {
         count: 0
     },
     
-    // Sample products
+    // Sample products (fallback data)
     products: [
         {
             id: 1,
-            name: 'Romantic Rose Bouquet',
-            price: 10000,
-            image: 'assets/images/img6.jpg',
-            description: 'Premium red roses with eucalyptus',
+            name: 'Heavenly Grace',
+            price: 15000,
+            image: 'assets/images/img11.jpg',
+            description: 'A delicate orchids — pure, airy, and refined.',
             rating: 5,
             reviews: 24
         },
         {
             id: 2,
-            name: 'Baby Pink Delight',
-            price: 6000,
-            image: 'assets/images/img.jpg',
-            description: 'Soft pink roses with baby\'s breath',
+            name: 'Sunflower Sunshine',
+            price: 5500,
+            image: 'assets/images/img10.jpg',
+            description: 'Bright sunflowers with complementary greens',
             rating: 4,
             reviews: 18
         },
         {
             id: 3,
-            name: 'Elegant White Lilies',
-            price: 7000,
-            image: 'assets/images/img8.jpg',
-            description: 'Pure white lilies with greenery',
+            name: 'Spring Garden Mix',
+            price: 8500,
+            image: 'assets/images/img9.jpg',
+            description: 'Mixed seasonal flowers in vibrant colors',
             rating: 5,
             reviews: 31
         },
         {
             id: 4,
-            name: 'Tropical Paradise Bouquet',
-            price: 8500,
-            image: 'assets/images/img9.jpg',
-            description: 'Exotic blooms for a fresh and peaceful touch',
+            name: 'Classic Red Roses',
+            price: 12000,
+            image: 'assets/images/img6.jpg',
+            description: 'Traditional dozen red roses',
             rating: 4,
             reviews: 12
         },
         {
             id: 5,
-            name: 'Sunflower Surprise',
-            price: 4500,
-            image: 'assets/images/img10.jpg',
+            name: 'Elegant White Lilies',
+            price: 7000,
+            image: 'assets/images/img8.jpg',
             description: 'Bright sunflowers with mixed seasonal flowers',
             rating: 5,
             reviews: 28
         },
         {
             id: 6,
-            name: 'Orchid Elegance',
+            name: 'Whispers of White',
             price: 6000,
-            image: 'assets/images/img11.jpg',
-            description: 'Graceful orchids in a modern pot',
+            image: 'assets/images/img.jpg',
+            description: 'A soft, cloud-like bouquet of tinted pink baby\'s breath.',
             rating: 5,
             reviews: 19
         }
     ],
-    
-    // Search suggestions
-    searchSuggestions: [
-        'roses', 'tulips', 'wedding bouquet', 'anniversary flowers',
-        'birthday arrangement', 'lilies', 'orchids', 'seasonal flowers'
-    ]
 };
 
 // =====================================================
@@ -113,7 +102,9 @@ const Utils = {
         
         // Remove toast after hiding
         toast.addEventListener('hidden.bs.toast', () => {
-            document.body.removeChild(toast);
+            if (document.body.contains(toast)) {
+                document.body.removeChild(toast);
+            }
         });
     },
     
@@ -148,10 +139,15 @@ const Cart = {
     
     // Add item to cart
     addItem: (productId) => {
-        const product = TsubakilFloral.products.find(p => p.id === productId);
-        if (!product) return;
+        console.log('Adding item to cart:', productId);
+        const product = TsubakilFloral.products.find(p => p.id === parseInt(productId));
+        if (!product) {
+            console.error('Product not found:', productId);
+            Utils.showToast('Product not found!', 'danger');
+            return;
+        }
         
-        const existingItem = TsubakilFloral.cart.items.find(item => item.id === productId);
+        const existingItem = TsubakilFloral.cart.items.find(item => item.id === parseInt(productId));
         
         if (existingItem) {
             existingItem.quantity += 1;
@@ -162,6 +158,7 @@ const Cart = {
         Cart.updateTotals();
         Cart.updateUI();
         Utils.showToast(`${product.name} added to cart!`);
+        console.log('Cart updated:', TsubakilFloral.cart);
     },
     
     // Update cart totals
@@ -183,131 +180,35 @@ const Cart = {
             cartCount.style.transform = 'scale(1.3)';
             setTimeout(() => cartCount.style.transform = 'scale(1)', 200);
         }
+        
+        // Update cart badge in navbar if exists
+        const cartBadges = document.querySelectorAll('.cart-badge, .badge');
+        cartBadges.forEach(badge => {
+            if (badge.closest('.nav-link') || badge.closest('[href*="cart"]')) {
+                badge.textContent = TsubakilFloral.cart.count;
+                if (TsubakilFloral.cart.count > 0) {
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        });
     },
     
     // Bind cart events
     bindEvents: () => {
+        // Use event delegation for dynamically added buttons
         document.addEventListener('click', (e) => {
-            if (e.target.closest('[data-add-to-cart]')) {
+            // Handle add to cart buttons
+            const addToCartBtn = e.target.closest('[data-add-to-cart]');
+            if (addToCartBtn) {
                 e.preventDefault();
-                const productId = parseInt(e.target.closest('[data-add-to-cart]').dataset.addToCart);
+                e.stopPropagation();
+                const productId = addToCartBtn.dataset.addToCart;
+                console.log('Add to cart clicked for product:', productId);
                 Cart.addItem(productId);
             }
         });
-    }
-};
-
-// =====================================================
-// SEARCH FUNCTIONALITY
-// =====================================================
-const Search = {
-    // Initialize search
-    init: () => {
-        Search.bindEvents();
-    },
-    
-    // Bind search events
-    bindEvents: () => {
-        const searchInput = document.getElementById('searchInput');
-        const searchBtn = document.getElementById('searchBtn');
-        
-        if (searchInput) {
-            // Handle search input with debounce
-            const debouncedSearch = Utils.debounce(Search.handleInput, 300);
-            searchInput.addEventListener('input', debouncedSearch);
-            
-            // Handle enter key
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    Search.performSearch(searchInput.value);
-                }
-            });
-            
-            // Show suggestions on focus
-            searchInput.addEventListener('focus', () => {
-                if (searchInput.value.length > 0) {
-                    Search.showSuggestions(searchInput.value);
-                }
-            });
-        }
-        
-        if (searchBtn) {
-            searchBtn.addEventListener('click', () => {
-                Search.performSearch(searchInput?.value || '');
-            });
-        }
-        
-        // Close suggestions when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('#searchCollapse')) {
-                Search.hideSuggestions();
-            }
-        });
-    },
-    
-    // Handle search input
-    handleInput: (e) => {
-        const query = e.target.value.trim();
-        if (query.length > 0) {
-            Search.showSuggestions(query);
-        } else {
-            Search.hideSuggestions();
-        }
-    },
-    
-    // Show search suggestions
-    showSuggestions: (query) => {
-        const container = document.getElementById('searchSuggestions');
-        if (!container) return;
-        
-        const filtered = TsubakilFloral.searchSuggestions
-            .filter(s => s.toLowerCase().includes(query.toLowerCase()))
-            .slice(0, 5);
-        
-        if (filtered.length > 0) {
-            const html = filtered.map(suggestion => 
-                `<div class="suggestion-item p-2 border-bottom" data-suggestion="${suggestion}">
-                    <i class="bi bi-search me-2"></i>${suggestion}
-                </div>`
-            ).join('');
-            
-            container.innerHTML = `<div class="suggestions-list bg-white border rounded shadow-sm mt-1">${html}</div>`;
-            
-            // Bind suggestion clicks
-            container.querySelectorAll('.suggestion-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const suggestion = item.dataset.suggestion;
-                    document.getElementById('searchInput').value = suggestion;
-                    Search.performSearch(suggestion);
-                    Search.hideSuggestions();
-                });
-            });
-        }
-    },
-    
-    // Hide suggestions
-    hideSuggestions: () => {
-        const container = document.getElementById('searchSuggestions');
-        if (container) container.innerHTML = '';
-    },
-    
-    // Perform search
-    performSearch: (query) => {
-        if (!query.trim()) {
-            Utils.showToast('Please enter a search term', 'warning');
-            return;
-        }
-        
-        Utils.showToast(`Searching for "${query}"...`, 'info');
-        Search.hideSuggestions();
-        
-        // Close search collapse on mobile
-        const searchCollapse = document.getElementById('searchCollapse');
-        if (searchCollapse) {
-            const bsCollapse = bootstrap.Collapse.getInstance(searchCollapse);
-            if (bsCollapse) bsCollapse.hide();
-        }
     }
 };
 
@@ -317,135 +218,146 @@ const Search = {
 const Products = {
     // Initialize products
     init: () => {
-        Products.setupProductCards();
-        Products.setupQuickView();
+        // Wait a bit for DOM to be fully ready
+        setTimeout(() => {
+            Products.extractProductsFromDOM();
+            Products.setupProductCards();
+            Products.setupQuickView();
+        }, 100);
     },
 
-    // Setup product card interactions
-    setupProductCards: () => {
-        // Get all product cards and extract data from them
-        const cardSelectors = ['.product-card', '.card', '[class*="card"]', '.col .card', '.product', '.item'];
-        let cards = [];
+    // Extract products from existing DOM elements
+    extractProductsFromDOM: () => {
+        const productCards = document.querySelectorAll('.product-card, .card');
+        console.log(`Found ${productCards.length} product cards in DOM`);
         
-        // Try different selectors to find product cards
-        cardSelectors.forEach(selector => {
-            const foundCards = document.querySelectorAll(selector);
-            foundCards.forEach(card => {
-                // Only add if it contains an image and hasn't been processed
-                if (card.querySelector('img') && !card.dataset.processed && !cards.includes(card)) {
-                    cards.push(card);
-                }
-            });
-        });
-
-        console.log(`Found ${cards.length} product cards`);
-
-        cards.forEach((card, index) => {
-            card.dataset.processed = 'true';
-            const productId = index + 1;
-            
-            // Find and setup add to cart button
-            const addToCartBtn = card.querySelector('.btn-primary, .btn[class*="primary"], button[class*="cart"], .add-to-cart');
-            if (addToCartBtn && !addToCartBtn.dataset.addToCart) {
-                addToCartBtn.dataset.addToCart = productId;
-                console.log(`Set up add to cart for product ${productId}`);
-            }
-
-            // Find and setup quick view button - try multiple selectors
-            const quickViewSelectors = [
-                '.btn-light', 
-                '.btn-outline-primary', 
-                '.btn-secondary', 
-                '.btn[class*="light"]',
-                '.btn[class*="outline"]',
-                'button:not(.btn-primary):not([class*="cart"])',
-                '.quick-view',
-                '.view-details'
-            ];
-            
-            let quickViewBtn = null;
-            for (const selector of quickViewSelectors) {
-                quickViewBtn = card.querySelector(selector);
-                if (quickViewBtn) break;
-            }
-            
-            // If no specific button found, create one
-            if (!quickViewBtn && addToCartBtn) {
-                quickViewBtn = document.createElement('button');
-                quickViewBtn.className = 'btn btn-outline-primary btn-sm ms-2';
-                quickViewBtn.innerHTML = '<i class="bi bi-eye"></i> Quick View';
-                addToCartBtn.parentNode.appendChild(quickViewBtn);
-            }
-            
-            if (quickViewBtn && !quickViewBtn.dataset.quickView) {
-                quickViewBtn.dataset.quickView = productId;
-                console.log(`Set up quick view for product ${productId}`);
+        productCards.forEach((card, index) => {
+            try {
+                // Get product ID from various possible sources
+                let productId = null;
                 
-                // Store product data from HTML for quick view
-                Products.extractProductData(card, productId);
+                // Check for existing data attributes
+                const quickViewBtn = card.querySelector('[data-quick-view]');
+                const addToCartBtn = card.querySelector('[data-add-to-cart]');
+                
+                if (quickViewBtn && quickViewBtn.dataset.quickView) {
+                    productId = parseInt(quickViewBtn.dataset.quickView);
+                } else if (addToCartBtn && addToCartBtn.dataset.addToCart) {
+                    productId = parseInt(addToCartBtn.dataset.addToCart);
+                } else {
+                    // Generate ID based on index
+                    productId = index + 1;
+                }
+                
+                // Extract product information from card
+                const img = card.querySelector('img');
+                const title = card.querySelector('.card-title, h5, h6, h4, h3, .product-title, .title');
+                const description = card.querySelector('.card-text, .text-muted:not(.small), .description');
+                const priceElement = card.querySelector('.text-primary, .fw-bold, .price, .h5');
+                
+                if (img && title) {
+                    const productData = {
+                        id: productId,
+                        name: title.textContent.trim(),
+                        image: img.src || img.dataset.src || 'https://via.placeholder.com/400x300/f8f9fa/6c757d?text=Product+Image',
+                        description: description ? description.textContent.trim() : 'Beautiful flower arrangement',
+                        price: priceElement ? Products.extractPrice(priceElement.textContent) : 5000,
+                        rating: Products.extractRating(card) || 5,
+                        reviews: Products.extractReviews(card) || Math.floor(Math.random() * 30) + 10
+                    };
+                    
+                    console.log(`Extracted product ${productId}:`, productData);
+                    
+                    // Update or add to products array
+                    const existingIndex = TsubakilFloral.products.findIndex(p => p.id === productId);
+                    if (existingIndex === -1) {
+                        TsubakilFloral.products.push(productData);
+                    } else {
+                        TsubakilFloral.products[existingIndex] = { ...TsubakilFloral.products[existingIndex], ...productData };
+                    }
+                }
+            } catch (error) {
+                console.warn('Error extracting product data from card:', error);
             }
         });
-    },
-
-    // Extract product data from HTML card
-    extractProductData: (card, productId) => {
-        try {
-            // Try multiple selectors for each element
-            const img = card.querySelector('img[src], img[data-src], .card-img-top, .product-image img, .image img');
-            const title = card.querySelector('.card-title, h5, h6, h4, h3, .product-title, .title, .name');
-            const description = card.querySelector('.card-text, .text-muted, .description, p:not(:empty)');
-            const price = card.querySelector('.text-primary, .fw-bold, .price, .cost, [class*="price"]');
-            
-            console.log(`Extracting data for product ${productId}:`, {
-                img: img?.src,
-                title: title?.textContent,
-                description: description?.textContent,
-                price: price?.textContent
-            });
-            
-            // Create product data from HTML
-            const productData = {
-                id: parseInt(productId),
-                name: title ? title.textContent.trim() : `Product ${productId}`,
-                image: img ? (img.src || img.dataset.src || img.getAttribute('src')) : '',
-                description: description ? description.textContent.trim() : 'Beautiful flower arrangement',
-                price: price ? Products.extractPrice(price.textContent) : 5000,
-                rating: 5,
-                reviews: Math.floor(Math.random() * 30) + 10
-            };
-
-            // Fallback image if none found
-            if (!productData.image || productData.image === '') {
-                productData.image = 'https://via.placeholder.com/400x300/f8f9fa/6c757d?text=Product+Image';
-            }
-
-            console.log('Final product data:', productData);
-
-            // Store in products array if not exists
-            const existingIndex = TsubakilFloral.products.findIndex(p => p.id === parseInt(productId));
-            if (existingIndex === -1) {
-                TsubakilFloral.products.push(productData);
-            } else {
-                // Update existing product with HTML data
-                TsubakilFloral.products[existingIndex] = { ...TsubakilFloral.products[existingIndex], ...productData };
-            }
-        } catch (error) {
-            console.warn('Could not extract product data from card:', error);
-        }
+        
+        console.log('Final products array:', TsubakilFloral.products);
     },
 
     // Extract price from text
     extractPrice: (priceText) => {
-        const match = priceText.match(/[\d,]+/);
-        return match ? parseInt(match[0].replace(/,/g, '')) : 5000;
+        // Remove ¥ symbol and commas, extract numbers
+        const match = priceText.replace(/[¥,]/g, '').match(/\d+/);
+        return match ? parseInt(match[0]) : 5000;
+    },
+
+    // Extract rating from card
+    extractRating: (card) => {
+        const stars = card.querySelectorAll('.bi-star-fill');
+        return stars.length || null;
+    },
+
+    // Extract reviews count from card
+    extractReviews: (card) => {
+        const reviewsElement = card.querySelector('.text-muted small, .small');
+        if (reviewsElement) {
+            const match = reviewsElement.textContent.match(/\((\d+)\)/);
+            return match ? parseInt(match[1]) : null;
+        }
+        return null;
+    },
+
+    // Setup product card interactions
+    setupProductCards: () => {
+        const productCards = document.querySelectorAll('.product-card, .card');
+        console.log(`Setting up ${productCards.length} product cards`);
+
+        productCards.forEach((card, index) => {
+            const productId = index + 1;
+            
+            // Setup add to cart button
+            let addToCartBtn = card.querySelector('[data-add-to-cart]');
+            if (!addToCartBtn) {
+                // Find button by class or create one
+                addToCartBtn = card.querySelector('.btn-primary, .btn[class*="primary"], button[class*="cart"]');
+                if (addToCartBtn) {
+                    addToCartBtn.dataset.addToCart = productId;
+                }
+            }
+            
+            // Setup quick view button
+            let quickViewBtn = card.querySelector('[data-quick-view]');
+            if (!quickViewBtn) {
+                // Find existing button or create one
+                quickViewBtn = card.querySelector('.btn-light, .btn-outline-primary, .btn-secondary');
+                if (quickViewBtn) {
+                    quickViewBtn.dataset.quickView = productId;
+                } else if (addToCartBtn) {
+                    // Create quick view button if it doesn't exist
+                    quickViewBtn = document.createElement('button');
+                    quickViewBtn.className = 'btn btn-light btn-sm me-2';
+                    quickViewBtn.innerHTML = '<i class="bi bi-eye"></i>';
+                    quickViewBtn.dataset.quickView = productId;
+                    quickViewBtn.title = 'Quick View';
+                    
+                    // Insert before add to cart button
+                    addToCartBtn.parentNode.insertBefore(quickViewBtn, addToCartBtn);
+                }
+            }
+            
+            console.log(`Setup product ${productId} - Add to cart: ${!!addToCartBtn}, Quick view: ${!!quickViewBtn}`);
+        });
     },
 
     // Setup quick view functionality
     setupQuickView: () => {
         document.addEventListener('click', (e) => {
-            if (e.target.closest('[data-quick-view]')) {
+            const quickViewBtn = e.target.closest('[data-quick-view]');
+            if (quickViewBtn) {
                 e.preventDefault();
-                const productId = parseInt(e.target.closest('[data-quick-view]').dataset.quickView);
+                e.stopPropagation();
+                const productId = parseInt(quickViewBtn.dataset.quickView);
+                console.log('Quick view clicked for product:', productId);
                 Products.showQuickView(productId);
             }
         });
@@ -454,7 +366,6 @@ const Products = {
     // Show product quick view modal
     showQuickView: (productId) => {
         console.log(`Showing quick view for product ID: ${productId}`);
-        console.log('Available products:', TsubakilFloral.products);
         
         const product = TsubakilFloral.products.find(p => p.id === productId);
         if (!product) {
@@ -463,7 +374,7 @@ const Products = {
             return;
         }
 
-        console.log('Product found:', product);
+        console.log('Product found for quick view:', product);
 
         // Remove existing modal
         const existing = document.getElementById('quickViewModal');
@@ -475,16 +386,14 @@ const Products = {
             imageUrl = 'https://via.placeholder.com/400x300/f8f9fa/6c757d?text=Product+Image';
         }
 
-        console.log('Using image URL:', imageUrl);
-
-        // Create modal with error handling for image
+        // Create modal
         const modalHTML = `
-            <div class="modal fade" id="quickViewModal" tabindex="-1">
+            <div class="modal fade" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header border-0">
-                            <h5 class="modal-title fw-bold">${product.name}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <h5 class="modal-title fw-bold" id="quickViewModalLabel">${product.name}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="row">
@@ -493,8 +402,7 @@ const Products = {
                                         <img src="${imageUrl}" 
                                              class="img-fluid rounded product-modal-image" 
                                              alt="${product.name}"
-                                             onload="console.log('Image loaded successfully')"
-                                             onerror="console.log('Image failed to load, using fallback'); this.src='https://via.placeholder.com/400x300/f8f9fa/6c757d?text=Product+Image'">
+                                             onerror="this.src='https://via.placeholder.com/400x300/f8f9fa/6c757d?text=Product+Image'">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -534,7 +442,10 @@ const Products = {
 
         // Clean up when hidden
         document.getElementById('quickViewModal').addEventListener('hidden.bs.modal', () => {
-            document.getElementById('quickViewModal').remove();
+            const modalElement = document.getElementById('quickViewModal');
+            if (modalElement) {
+                modalElement.remove();
+            }
         });
     }
 };
@@ -669,27 +580,22 @@ const Animations = {
     
     // Back to top button
     setupBackToTop: () => {
-        // Create back to top button
-        const btn = document.createElement('button');
-        btn.id = 'backToTopBtn';
-        btn.className = 'back-to-top d-none';
-        btn.innerHTML = '<i class="bi bi-arrow-up"></i>';
-        btn.setAttribute('aria-label', 'Back to top');
-        document.body.appendChild(btn);
-        
-        // Show/hide on scroll
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                btn.classList.remove('d-none');
-            } else {
-                btn.classList.add('d-none');
-            }
-        });
-        
-        // Scroll to top on click
-        btn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        const existingBtn = document.getElementById('backToTopBtn');
+        if (existingBtn) {
+            // Show/hide on scroll
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    existingBtn.classList.remove('d-none');
+                } else {
+                    existingBtn.classList.add('d-none');
+                }
+            });
+            
+            // Scroll to top on click
+            existingBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
     },
     
     // Inject CSS animations
@@ -707,32 +613,13 @@ const Animations = {
             .card {
                 transition: all 0.3s ease;
             }
-            .back-to-top {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 1000;
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                background: linear-gradient(135deg, #ff6b9d, #c44569);
-                border: none;
-                color: white;
-                font-size: 18px;
-                cursor: pointer;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                transition: all 0.3s ease;
+            .product-overlay {
+                background: rgba(0,0,0,0.7);
+                opacity: 0;
+                transition: opacity 0.3s ease;
             }
-            .back-to-top:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-            }
-            .suggestion-item {
-                cursor: pointer;
-                transition: background-color 0.2s ease;
-            }
-            .suggestion-item:hover {
-                background-color: #f8f9fa;
+            .product-card:hover .product-overlay {
+                opacity: 1;
             }
             .toast {
                 animation: slideInRight 0.3s ease;
@@ -819,20 +706,16 @@ const App = {
     // Start application
     start: () => {
         try {
+            console.log('Initializing TSUBAKI FLORAL application...');
+            
             // Initialize all modules
             Cart.init();
-            Search.init();
             Products.init();
             Forms.init();
             Animations.init();
             Mobile.init();
             
-            // Welcome message
-            setTimeout(() => {
-                Utils.showToast('Welcome to TSUBAKI FLORAL! 🌸', 'success');
-            }, 1000);
-            
-            console.log('🌸 TSUBAKI FLORAL initialized successfully');
+            console.log('Application initialized successfully');
             
         } catch (error) {
             console.error('Initialization error:', error);
@@ -846,6 +729,6 @@ const App = {
 // =====================================================
 App.init();
 
-// Make available globally for debugging
+
 window.TsubakilFloral = TsubakilFloral;
-window.TsubakilFloralApp = { Cart, Search, Products, Forms, Animations, Mobile, Utils };
+window.TsubakilFloralApp = { Cart, Products, Forms, Animations, Mobile, Utils };
